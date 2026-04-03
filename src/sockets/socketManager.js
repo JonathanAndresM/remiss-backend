@@ -1,4 +1,5 @@
 import Driver from '../models/Driver.js';
+import jwt from 'jsonwebtoken';
 
 export const configureSockets = (io) => {
   // Middleware para autenticar socket con JWT (opcional)
