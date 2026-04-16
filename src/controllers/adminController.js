@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import Driver from '../models/Driver.js';
 import Ride from '../models/Ride.js';
+import { USER_ROLE } from '../constants/index.js';
 
 // Obtener conductores con paginación y filtros
 export const getDrivers = async (req, res) => {
@@ -55,7 +56,7 @@ export const createDriver = async (req, res) => {
       email,
       password,
       phone,
-      role: 'driver',
+      role: USER_ROLE.DRIVER,
     });
     
     const driver = await Driver.create({
@@ -117,7 +118,7 @@ export const deleteDriver = async (req, res) => {
 export const getUsers = async (req, res) => {
   try {
     const { page = 1, limit = 10, search } = req.query;
-    const filter = { role: 'customer' };
+    const filter = { role: USER_ROLE.CUSTOMER };
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -143,7 +144,7 @@ export const getUsers = async (req, res) => {
 export const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user || user.role !== 'customer') return res.status(404).json({ message: 'Usuario no encontrado' });
+    if (!user || user.role !== USER_ROLE.CUSTOMER) return res.status(404).json({ message: 'Usuario no encontrado' });
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -155,7 +156,7 @@ export const createUser = async (req, res) => {
     const { name, email, password, phone } = req.body;
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'Email ya registrado' });
-    const user = await User.create({ name, email, password, phone, role: 'customer' });
+    const user = await User.create({ name, email, password, phone, role: USER_ROLE.CUSTOMER });
     res.status(201).json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -165,7 +166,7 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user || user.role !== 'customer') return res.status(404).json({ message: 'Usuario no encontrado' });
+    if (!user || user.role !== USER_ROLE.CUSTOMER) return res.status(404).json({ message: 'Usuario no encontrado' });
     const { name, email, phone } = req.body;
     if (name) user.name = name;
     if (email) user.email = email;
@@ -180,7 +181,7 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user || user.role !== 'customer') return res.status(404).json({ message: 'Usuario no encontrado' });
+    if (!user || user.role !== USER_ROLE.CUSTOMER) return res.status(404).json({ message: 'Usuario no encontrado' });
     await user.deleteOne();
     res.json({ message: 'Usuario eliminado' });
   } catch (error) {
@@ -200,8 +201,8 @@ export const getRides = async (req, res) => {
     if (customerId) filter.customer = customerId;
     
     const rides = await Ride.find(filter)
-      .populate('customer', 'name email')
-      .populate('driver', 'name email')
+      .populate(USER_ROLE.CUSTOMER, 'name email')
+      .populate(USER_ROLE.DRIVER, 'name email')
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ createdAt: -1 });
@@ -221,8 +222,8 @@ export const getRides = async (req, res) => {
 export const getRideById = async (req, res) => {
   try {
     const ride = await Ride.findById(req.params.id)
-      .populate('customer', 'name email phone')
-      .populate('driver', 'name email phone');
+      .populate(USER_ROLE.CUSTOMER, 'name email phone')
+      .populate(USER_ROLE.DRIVER, 'name email phone');
     if (!ride) return res.status(404).json({ message: 'Viaje no encontrado' });
     res.json(ride);
   } catch (error) {
@@ -258,7 +259,7 @@ export const deleteRide = async (req, res) => {
 export const getDashboardStats = async (req, res) => {
   try {
     const totalDrivers = await Driver.countDocuments();
-    const totalUsers = await User.countDocuments({ role: 'customer' });
+    const totalUsers = await User.countDocuments({ role: USER_ROLE.CUSTOMER });
     const totalRides = await Ride.countDocuments();
     const today = new Date();
     today.setHours(0, 0, 0, 0);

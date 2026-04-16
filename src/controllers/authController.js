@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import Driver from '../models/Driver.js';
+import { USER_ROLE } from '../constants/index.js';
 
 // Generar JWT
 const generateToken = (id) => {
@@ -25,7 +26,7 @@ export const register = async (req, res) => {
       email,
       password,
       phone,
-      role: role || 'customer',
+      role: role || USER_ROLE.CUSTOMER,
     });
 
     // Si es conductor, crear registro en Driver
@@ -81,7 +82,7 @@ export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
     let driverData = null;
-    if (user.role === 'driver') {
+    if (user.role === USER_ROLE.DRIVER) {
       driverData = await Driver.findOne({ user: user._id });
     }
     res.json({ user, driver: driverData });
