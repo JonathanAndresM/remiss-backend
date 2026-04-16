@@ -4,7 +4,7 @@ import { dirname, join } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const serviceAccountPath = '/etc/secrets/firebase-service-account.json';
+const serviceAccountPath = '../../etc/secrets/firebase-service-account.json';
 // Ajusta esta ruta según dónde hayas guardado tu archivo JSON de credenciales
 const serviceAccount = join(__dirname, serviceAccountPath);
 
