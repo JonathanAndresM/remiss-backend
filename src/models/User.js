@@ -8,16 +8,9 @@ const userSchema = new mongoose.Schema({
     phone: { type: String, required: true },
     role: { type: String, enum: ['customer', 'driver', 'admin'], default: 'customer' },
     isActive: { type: Boolean, default: true },
+    pendingPenalty: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now },
 });
-
-// Encriptar contraseña antes de guardar
-/*userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-});*/
 
 // Método para comparar contraseñas
 userSchema.methods.comparePassword = async function (candidatePassword) {
