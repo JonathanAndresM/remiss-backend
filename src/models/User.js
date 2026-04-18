@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     role: { type: String, enum: ['customer', 'driver', 'admin'], default: 'customer' },
     isActive: { type: Boolean, default: true },
     pendingPenalty: { type: Number, default: 0 },
+    fcmToken: { type: String, default: null },
     createdAt: { type: Date, default: Date.now },
 });
 
